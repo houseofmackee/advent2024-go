@@ -19,7 +19,7 @@ func absDiffInt(x, y int) int {
 
 func main() {
 
-	// load the file called input.txt
+	// open the file called input.txt
 	file, err := os.Open("input.txt")
 	if err != nil {
 		pl("Error: ", err)
@@ -55,6 +55,7 @@ func main() {
 	}
 	pl("Total distance:", sum)
 
+	// calculate the similarity score between the two slices
 	var sscore int
 	for i := 0; i < len(leftNums); i++ {
 		for j := 0; j < len(rightNums); j++ {
@@ -63,6 +64,5 @@ func main() {
 			}
 		}
 	}
-
 	pl("Similarity score:", sscore)
 }
