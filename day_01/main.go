@@ -57,10 +57,10 @@ func main() {
 
 	// calculate the similarity score between the two slices
 	var sscore int
-	for i := 0; i < len(leftNums); i++ {
-		for j := 0; j < len(rightNums); j++ {
-			if leftNums[i] == rightNums[j] {
-				sscore += leftNums[i]
+	for _, leftNum := range leftNums {
+		for _, rightNum := range rightNums {
+			if leftNum == rightNum {
+				sscore += leftNum
 			}
 		}
 	}
