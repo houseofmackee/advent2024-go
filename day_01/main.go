@@ -48,7 +48,7 @@ func main() {
 		return rightNums[i] < rightNums[j]
 	})
 
-	// caluclate the sum of the absolute differences between the two slices
+	// calculate the sum of the absolute differences between the two slices
 	var sum int
 	for i := 0; i < len(leftNums); i++ {
 		sum += absDiffInt(leftNums[i], rightNums[i])
