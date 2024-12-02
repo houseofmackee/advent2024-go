@@ -20,7 +20,7 @@ func absDiffInt(x, y int) int {
 func main() {
 
 	// open the file called input.txt
-	file, err := os.Open("input.txt")
+	file, err := os.Open("input_test.txt")
 	if err != nil {
 		pl("Error: ", err)
 		return
@@ -48,6 +48,20 @@ func main() {
 		return rightNums[i] < rightNums[j]
 	})
 
+	// count unique numbers in the left slice and print the count
+	var uniqueNums = make(map[int]bool)
+	for _, leftNum := range leftNums {
+		uniqueNums[leftNum] = true
+	}
+	pl("Unique numbers in the left slice:", len(uniqueNums))
+
+	// count unique numbers in the right slice and print the count
+	uniqueNums = make(map[int]bool)
+	for _, rightNum := range rightNums {
+		uniqueNums[rightNum] = true
+	}
+	pl("Unique numbers in the right slice:", len(uniqueNums))
+
 	// calculate the sum of the absolute differences between the two slices
 	var sum int
 	for i := 0; i < len(leftNums); i++ {
@@ -62,6 +76,18 @@ func main() {
 			if leftNum == rightNum {
 				sscore += leftNum
 			}
+		}
+	}
+	pl("Similarity score:", sscore)
+
+	sscore = 0
+	var freqMap = make(map[int]int)
+	for _, rightNum := range rightNums {
+		freqMap[rightNum]++
+	}
+	for _, leftNum := range leftNums {
+		if freqMap[leftNum] > 0 {
+			sscore += freqMap[leftNum] * leftNum
 		}
 	}
 	pl("Similarity score:", sscore)
