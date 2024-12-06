@@ -50,12 +50,9 @@ func coordsToIndex(x, y, width int) int {
 func checkRoomLocation(x, y int, room *Room) int {
 	if x < 0 || x >= room.width || y < 0 || y >= room.height {
 		return OFFGRID
-	}
-
-	if room.grid[coordsToIndex(x, y, room.width)] == '#' {
+	} else if room.grid[coordsToIndex(x, y, room.width)] == '#' {
 		return BLOCKED
 	}
-
 	return VALID
 }
 
@@ -72,10 +69,12 @@ func moveGuardInRoom(guard *Guard, room *Room) int {
 		x, y = -1, 0
 	}
 
-	move := checkRoomLocation(guard.x+x, guard.y+y, room)
+	x += guard.x
+	y += guard.y
+	move := checkRoomLocation(x, y, room)
 	if move == VALID {
-		guard.x += x
-		guard.y += y
+		guard.x = x
+		guard.y = y
 		room.grid[coordsToIndex(guard.x, guard.y, room.width)] = '*'
 	} else if move == BLOCKED {
 		guard.facing++
@@ -153,14 +152,14 @@ func main() {
 			if moveResult == OFFGRID {
 				break
 			}
-			if moveResult == BLOCKED {
-				for _, entry := range guardHistory {
-					if entry == tempGuard {
-						moveResult = LOOP
-						break
-					}
+
+			for _, entry := range guardHistory {
+				if entry == tempGuard {
+					moveResult = LOOP
+					break
 				}
 			}
+
 			if moveResult == LOOP {
 				loops++
 				break
