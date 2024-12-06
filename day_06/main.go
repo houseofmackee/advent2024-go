@@ -73,9 +73,7 @@ func moveGuardInRoom(guard *Guard, room *Room) int {
 	}
 
 	move := checkRoomLocation(guard.x+x, guard.y+y, room)
-	if move == OFFGRID {
-		return move
-	} else if move == VALID {
+	if move == VALID {
 		guard.x += x
 		guard.y += y
 		room.grid[coordsToIndex(guard.x, guard.y, room.width)] = '*'
