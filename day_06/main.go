@@ -11,10 +11,19 @@ import (
 // I am lazy...
 var pl = fmt.Println
 
-const OFFGRID = 0
-const BLOCKED = 1
-const VALID = 2
-const LOOP = 3
+const (
+	OFFGRID = iota
+	BLOCKED
+	VALID
+	LOOP
+)
+
+const (
+	NORTH = iota
+	EAST
+	SOUTH
+	WEST
+)
 
 type Guard struct {
 	x      int
@@ -53,13 +62,13 @@ func checkRoomLocation(x, y int, room *Room) int {
 func moveGuardInRoom(guard *Guard, room *Room) int {
 	var x, y int
 	switch guard.facing {
-	case 0:
+	case NORTH:
 		x, y = 0, -1
-	case 1:
+	case EAST:
 		x, y = 1, 0
-	case 2:
+	case SOUTH:
 		x, y = 0, 1
-	case 3:
+	case WEST:
 		x, y = -1, 0
 	}
 
@@ -69,7 +78,7 @@ func moveGuardInRoom(guard *Guard, room *Room) int {
 	} else if move == VALID {
 		guard.x += x
 		guard.y += y
-		room.grid[coordsToIndex(guard.x, guard.y, room.width)] = '*' //room.grid[:coordsToIndex(guard.x, guard.y, room.width)] + "*" + room.grid[coordsToIndex(guard.x, guard.y, room.width)+1:]
+		room.grid[coordsToIndex(guard.x, guard.y, room.width)] = '*'
 	} else if move == BLOCKED {
 		guard.facing++
 		if guard.facing > 3 {
@@ -87,16 +96,6 @@ func count(grid []byte, value byte) int {
 		}
 	}
 	return count
-}
-
-func printRoom(room *Room) {
-	for i, char := range room.grid {
-		if i%room.width == 0 {
-			pl()
-		}
-		fmt.Printf("%c", char)
-	}
-	pl()
 }
 
 func main() {
@@ -121,7 +120,7 @@ func main() {
 	room := Room{maxW, maxY, grid}
 
 	posX, posY := indexToCoords(guardIndex, maxW)
-	guard := Guard{posX, posY, 0}
+	guard := Guard{posX, posY, NORTH}
 
 	// process Part 1
 	for {
@@ -145,7 +144,7 @@ func main() {
 		copy(tempGrid, mainGrid)
 		tempGrid[i] = '#'
 		tempRoom := Room{maxW, maxY, tempGrid}
-		tempGuard := Guard{posX, posY, 0}
+		tempGuard := Guard{posX, posY, NORTH}
 		guardHistory := []Guard{}
 
 		for {
@@ -157,7 +156,6 @@ func main() {
 				break
 			}
 			if moveResult == BLOCKED {
-
 				for _, entry := range guardHistory {
 					if entry == tempGuard {
 						moveResult = LOOP
@@ -165,12 +163,11 @@ func main() {
 					}
 				}
 			}
-			if moveResult != LOOP {
-				guardHistory = append(guardHistory, tempGuard)
-			} else {
+			if moveResult == LOOP {
 				loops++
 				break
 			}
+			guardHistory = append(guardHistory, tempGuard)
 		}
 	}
 	pl("Time:", time.Since(start))
