@@ -11,6 +11,11 @@ import (
 // I am lazy...
 var pl = fmt.Println
 
+const OFFGRID = 0
+const BLOCKED = 1
+const VALID = 2
+const LOOP = 3
+
 type Guard struct {
 	x      int
 	y      int
@@ -20,7 +25,7 @@ type Guard struct {
 type Room struct {
 	width  int
 	height int
-	grid   string
+	grid   []byte
 }
 
 func indexToCoords(index, width int) (int, int) {
@@ -33,19 +38,19 @@ func coordsToIndex(x, y, width int) int {
 	return y*width + x
 }
 
-func checkRoomLocation(x, y int, room *Room) string {
+func checkRoomLocation(x, y int, room *Room) int {
 	if x < 0 || x >= room.width || y < 0 || y >= room.height {
-		return "offgrid"
+		return OFFGRID
 	}
 
 	if room.grid[coordsToIndex(x, y, room.width)] == '#' {
-		return "blocked"
+		return BLOCKED
 	}
 
-	return "valid"
+	return VALID
 }
 
-func moveGuardInRoom(guard *Guard, room *Room) string {
+func moveGuardInRoom(guard *Guard, room *Room) int {
 	var x, y int
 	switch guard.facing {
 	case 0:
@@ -59,19 +64,39 @@ func moveGuardInRoom(guard *Guard, room *Room) string {
 	}
 
 	move := checkRoomLocation(guard.x+x, guard.y+y, room)
-	if move == "offgrid" {
+	if move == OFFGRID {
 		return move
-	} else if move == "valid" {
+	} else if move == VALID {
 		guard.x += x
 		guard.y += y
-		room.grid = room.grid[:coordsToIndex(guard.x, guard.y, room.width)] + "*" + room.grid[coordsToIndex(guard.x, guard.y, room.width)+1:]
-	} else if move == "blocked" {
+		room.grid[coordsToIndex(guard.x, guard.y, room.width)] = '*' //room.grid[:coordsToIndex(guard.x, guard.y, room.width)] + "*" + room.grid[coordsToIndex(guard.x, guard.y, room.width)+1:]
+	} else if move == BLOCKED {
 		guard.facing++
 		if guard.facing > 3 {
 			guard.facing = 0
 		}
 	}
 	return move
+}
+
+func count(grid []byte, value byte) int {
+	count := 0
+	for _, char := range grid {
+		if char == value {
+			count++
+		}
+	}
+	return count
+}
+
+func printRoom(room *Room) {
+	for i, char := range room.grid {
+		if i%room.width == 0 {
+			pl()
+		}
+		fmt.Printf("%c", char)
+	}
+	pl()
 }
 
 func main() {
@@ -82,31 +107,33 @@ func main() {
 	defer file.Close()
 
 	var maxW, maxY int
-	var grid string
+	var grids string
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		maxW = len(line)
 		maxY++
-		grid += line
+		grids += line
 	}
-	grid = strings.Replace(grid, "^", "X", -1)
+	grids = strings.Replace(grids, "^", "X", -1)
+	guardIndex := strings.Index(grids, "X")
+	grid := []byte(grids)
 	room := Room{maxW, maxY, grid}
 
-	guardIndex := strings.Index(grid, "X")
 	posX, posY := indexToCoords(guardIndex, maxW)
 	guard := Guard{posX, posY, 0}
 
 	// process Part 1
 	for {
-		if moveGuardInRoom(&guard, &room) == "offgrid" {
+		if moveGuardInRoom(&guard, &room) == OFFGRID {
 			break
 		}
 	}
-	pl("Part 1:", strings.Count(room.grid, "*"))
+	pl("Part 1:", count(room.grid, '*'))
 
 	// process Part 2
-	grid = room.grid
+	mainGrid := room.grid
+	mainGridLen := len(mainGrid)
 	loops := 0
 	start := time.Now()
 	for i := 0; i < len(grid); i++ {
@@ -114,29 +141,32 @@ func main() {
 			continue
 		}
 
-		tempGrid := grid[:i] + "#" + grid[i+1:]
-		room = Room{maxW, maxY, tempGrid}
-		guard := Guard{posX, posY, 0}
+		tempGrid := make([]byte, mainGridLen)
+		copy(tempGrid, mainGrid)
+		tempGrid[i] = '#'
+		tempRoom := Room{maxW, maxY, tempGrid}
+		tempGuard := Guard{posX, posY, 0}
 		guardHistory := []Guard{}
 
 		for {
-			moveResult := moveGuardInRoom(&guard, &room)
-			if moveResult == "offgrid" {
-				break
-			}
-			if moveResult == "valid" {
+			moveResult := moveGuardInRoom(&tempGuard, &tempRoom)
+			if moveResult == VALID {
 				continue
 			}
-			if moveResult == "blocked" {
-				for j := 0; j < len(guardHistory); j++ {
-					if guardHistory[j] == guard {
-						moveResult = "loop"
+			if moveResult == OFFGRID {
+				break
+			}
+			if moveResult == BLOCKED {
+
+				for _, entry := range guardHistory {
+					if entry == tempGuard {
+						moveResult = LOOP
 						break
 					}
 				}
 			}
-			if moveResult != "loop" {
-				guardHistory = append(guardHistory, guard)
+			if moveResult != LOOP {
+				guardHistory = append(guardHistory, tempGuard)
 			} else {
 				loops++
 				break
