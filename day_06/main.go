@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 )
@@ -152,15 +153,7 @@ func main() {
 			if moveResult == OFFGRID {
 				break
 			}
-
-			for _, entry := range guardHistory {
-				if entry == tempGuard {
-					moveResult = LOOP
-					break
-				}
-			}
-
-			if moveResult == LOOP {
+			if slices.Contains(guardHistory, tempGuard) {
 				loops++
 				break
 			}
