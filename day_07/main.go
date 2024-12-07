@@ -45,6 +45,10 @@ func parseEquationString(input string) (Equation, error) {
 	return Equation{beforeInt, afterInts}, nil
 }
 
+// function type for generating all possible combinations of operators
+type RuneGenerator func(int) [][]rune
+
+// generate all possible combinations of + and * operators
 func generateCombinations(length int) [][]rune {
 	// Total number of combinations is 2^length
 	total := 1 << length
@@ -63,8 +67,9 @@ func generateCombinations(length int) [][]rune {
 	return result
 }
 
+// generate all possible combinations of +, *, and | operators
 func generateConcatCombinations(length int) [][]rune {
-	chars := []rune{'+', '*', '|'}
+	chars := []rune{'*', '|', '+'}
 	total := int(math.Pow(3, float64(length))) // 3^length combinations
 	result := make([][]rune, 0, total)
 	for i := 0; i < total; i++ {
@@ -88,37 +93,11 @@ func concatenate(a, b int) int {
 }
 
 // brute force all possible combinations of operators
-func processEquation(equation Equation) int {
+func processEquation(equation Equation, gen RuneGenerator) int {
 	target := equation.result
 	values := equation.values
 	numOps := len(values)
-	runes := generateCombinations(numOps - 1)
-
-	for _, combo := range runes {
-		running := values[0]
-		for i := 0; i < numOps-1; i++ {
-			if combo[i] == '*' {
-				running *= values[i+1]
-			} else {
-				running += values[i+1]
-			}
-			if running > target {
-				break
-			}
-		}
-		if running == target {
-			return running
-		}
-	}
-
-	return 0
-}
-
-func processConcatEquation(equation Equation) int {
-	target := equation.result
-	values := equation.values
-	numOps := len(values)
-	runes := generateConcatCombinations(numOps - 1)
+	runes := gen(numOps - 1)
 
 	for _, combo := range runes {
 		running := values[0]
@@ -166,11 +145,11 @@ func main() {
 	sump1 := 0
 	invalids := []Equation{}
 	for _, equation := range equations {
-		result := processEquation(equation)
+		result := processEquation(equation, generateCombinations)
 		if result == 0 {
 			invalids = append(invalids, equation)
 		} else {
-			sump1 += processEquation(equation)
+			sump1 += result
 		}
 	}
 	pl("Time:", time.Since(start))
@@ -180,7 +159,7 @@ func main() {
 	start = time.Now()
 	sump2 := 0
 	for _, equation := range invalids {
-		sump2 += processConcatEquation(equation)
+		sump2 += processEquation(equation, generateConcatCombinations)
 	}
 	pl("Time:", time.Since(start))
 	pl("Part 2:", sump1+sump2)
