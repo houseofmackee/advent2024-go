@@ -129,17 +129,16 @@ func main() {
 	pl("Part 1:", count(room.grid, '*'))
 
 	// process Part 2
-	mainGrid := room.grid
+	mainGrid := slices.Clone(room.grid)
 	mainGridLen := len(mainGrid)
 	loops := 0
 	start := time.Now()
-	for i := 0; i < len(grid); i++ {
+	for i := 0; i < mainGridLen; i++ {
 		if grid[i] != '*' || i == guardIndex {
 			continue
 		}
 
-		tempGrid := make([]byte, mainGridLen)
-		copy(tempGrid, mainGrid)
+		tempGrid := slices.Clone(mainGrid)
 		tempGrid[i] = '#'
 		tempRoom := Room{maxW, maxY, tempGrid}
 		tempGuard := Guard{posX, posY, NORTH}
