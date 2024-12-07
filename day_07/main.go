@@ -49,40 +49,56 @@ func parseEquationString(input string) (Equation, error) {
 type RuneGenerator func(int) [][]rune
 
 // generate all possible combinations of + and * operators
-func generateCombinations(length int) [][]rune {
-	// Total number of combinations is 2^length
-	total := 1 << length
-	result := make([][]rune, 0, total)
-	for i := 0; i < total; i++ {
-		combo := make([]rune, length)
-		for pos := 0; pos < length; pos++ {
-			if (i & (1 << pos)) == 0 {
-				combo[pos] = '*'
-			} else {
-				combo[pos] = '+'
-			}
+func initGenerateCombinations() func(length int) [][]rune {
+	var cache = make(map[int][][]rune)
+
+	return func(length int) [][]rune {
+		if combo, ok := cache[length]; ok {
+			return combo
 		}
-		result = append(result, combo)
+		// Total number of combinations is 2^length
+		total := 1 << length
+		result := make([][]rune, 0, total)
+		for i := 0; i < total; i++ {
+			combo := make([]rune, length)
+			for pos := 0; pos < length; pos++ {
+				if (i & (1 << pos)) == 0 {
+					combo[pos] = '*'
+				} else {
+					combo[pos] = '+'
+				}
+			}
+			result = append(result, combo)
+		}
+		cache[length] = result
+		return result
 	}
-	return result
 }
 
 // generate all possible combinations of +, *, and | operators
-func generateConcatCombinations(length int) [][]rune {
-	chars := []rune{'*', '|', '+'}
-	total := int(math.Pow(3, float64(length))) // 3^length combinations
-	result := make([][]rune, 0, total)
-	for i := 0; i < total; i++ {
-		combo := make([]rune, length)
-		value := i
-		for pos := 0; pos < length; pos++ {
-			digit := value % 3
-			value = value / 3
-			combo[pos] = chars[digit]
+func initGenerateConcatCombinations() func(length int) [][]rune {
+	var cache = make(map[int][][]rune)
+
+	return func(length int) [][]rune {
+		if combo, ok := cache[length]; ok {
+			return combo
 		}
-		result = append(result, combo)
+		chars := []rune{'*', '|', '+'}
+		total := int(math.Pow(3, float64(length))) // 3^length combinations
+		result := make([][]rune, 0, total)
+		for i := 0; i < total; i++ {
+			combo := make([]rune, length)
+			value := i
+			for pos := 0; pos < length; pos++ {
+				digit := value % 3
+				value = value / 3
+				combo[pos] = chars[digit]
+			}
+			result = append(result, combo)
+		}
+		cache[length] = result
+		return result
 	}
-	return result
 }
 
 func concatenate(a, b int) int {
@@ -144,6 +160,7 @@ func main() {
 	start := time.Now()
 	sump1 := 0
 	invalids := []Equation{}
+	generateCombinations := initGenerateCombinations()
 	for _, equation := range equations {
 		result := processEquation(equation, generateCombinations)
 		if result == 0 {
@@ -158,8 +175,9 @@ func main() {
 	// process Part 2
 	start = time.Now()
 	sump2 := 0
+	generateCombinations = initGenerateConcatCombinations()
 	for _, equation := range invalids {
-		sump2 += processEquation(equation, generateConcatCombinations)
+		sump2 += processEquation(equation, generateCombinations)
 	}
 	pl("Time:", time.Since(start))
 	pl("Part 2:", sump1+sump2)
