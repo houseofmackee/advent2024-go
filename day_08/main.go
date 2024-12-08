@@ -23,10 +23,19 @@ type City struct {
 	grid   []byte
 }
 
-func indexToCoords(index, width int) Coords {
-	x := index % width
-	y := index / width
-	return Coords{x, y}
+func initIndexToCoords(w int) func(index int) Coords {
+	var cache = make(map[int]Coords)
+	var width = w
+	return func(index int) Coords {
+		if c, ok := cache[index]; ok {
+			return c
+		}
+		x := index % width
+		y := index / width
+		c := Coords{x, y}
+		cache[index] = c
+		return c
+	}
 }
 
 func isWithinBounds(c Coords, city *City) bool {
@@ -84,6 +93,7 @@ func main() {
 	mapSize := maxW * maxY
 	cityMap := City{maxW, maxY, mapSize, []byte(mapString)}
 	antiMap := City{maxW, maxY, mapSize, slices.Repeat([]byte{'.'}, mapSize)}
+	indexToCoords := initIndexToCoords(cityMap.width)
 
 	// Part 1
 	startP1 := time.Now()
@@ -94,13 +104,13 @@ func main() {
 		}
 
 		// get the coordinates of the current antenna node
-		freqCoords := indexToCoords(i, cityMap.width)
+		freqCoords := indexToCoords(i)
 
 		// find all other nodes with the same frequency
 		for j := i + 1; j < cityMap.size; j++ {
 			if cityMap.grid[j] == char {
 				// get the coordinates of the paired antenna node
-				pairCoords := indexToCoords(j, cityMap.width)
+				pairCoords := indexToCoords(j)
 
 				// calculate the distance between the two nodes
 				diff := coordsDiff(freqCoords, pairCoords)
@@ -127,13 +137,13 @@ func main() {
 		}
 
 		// get the coordinates of the current antenna node
-		freqCoords := indexToCoords(i, cityMap.width)
+		freqCoords := indexToCoords(i)
 
 		// find all other nodes with the same frequency
 		for j := i + 1; j < cityMap.size; j++ {
 			if cityMap.grid[j] == char {
 				// get the coordinates of the paired antenna node
-				pairCoords := indexToCoords(j, cityMap.width)
+				pairCoords := indexToCoords(j)
 
 				// calculate the distance between the two nodes
 				diff := coordsDiff(freqCoords, pairCoords)
