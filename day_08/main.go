@@ -126,7 +126,7 @@ func main() {
 	}
 
 	sumP1 := count(antiMap.grid, '#')
-	durartionP1 := time.Since(startP1)
+	durationP1 := time.Since(startP1)
 
 	// Part 2
 	startP2 := time.Now()
@@ -173,16 +173,16 @@ func main() {
 	}
 
 	sumP2 := count(antiMap.grid, '#')
-	durartionP2 := time.Since(startP2)
-	durartionOverAll := time.Since(startOverAll)
+	durationP2 := time.Since(startP2)
+	durationOverAll := time.Since(startOverAll)
 
 	pl("Part 1:", sumP1)
-	pl("Part 1 duration:", durartionP1)
+	pl("Part 1 duration:", durationP1)
 
 	pl("Part 2:", sumP2)
-	pl("Part 2 duration:", durartionP2)
+	pl("Part 2 duration:", durationP2)
 
-	pl("Overall duration:", durartionOverAll)
+	pl("Overall duration:", durationOverAll)
 
 	// for i := 0; i < antiMap.size; i++ {
 	// 	if i%antiMap.width == 0 {
