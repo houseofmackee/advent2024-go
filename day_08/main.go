@@ -60,6 +60,8 @@ func count(grid []byte, value byte) int {
 }
 
 func main() {
+	startOverAll := time.Now()
+
 	// Open the input file
 	file, err := os.Open("input.txt")
 	if err != nil {
@@ -84,7 +86,7 @@ func main() {
 	antiMap := City{maxW, maxY, mapSize, slices.Repeat([]byte{'.'}, mapSize)}
 
 	// Part 1
-	start := time.Now()
+	startP1 := time.Now()
 	for i, char := range cityMap.grid {
 		// ignore empty spaces and or frequencies that only appear once
 		if char == '.' { //} || count(cityMap.grid, char) == 1 {
@@ -113,13 +115,11 @@ func main() {
 		}
 	}
 
-	sum := count(antiMap.grid, '#')
-	durartion := time.Since(start)
-	pl("Part 1:", sum)
-	pl("Part 1 duration:", durartion)
+	sumP1 := count(antiMap.grid, '#')
+	durartionP1 := time.Since(startP1)
 
 	// Part 2
-	start = time.Now()
+	startP2 := time.Now()
 	for i, char := range cityMap.grid {
 		// ignore empty spaces and or frequencies that only appear once
 		if char == '.' { //|| count(cityMap.grid, char) == 1 {
@@ -162,10 +162,17 @@ func main() {
 		putAntiNode(freqCoords, &antiMap)
 	}
 
-	sum = count(antiMap.grid, '#')
-	durartion = time.Since(start)
-	pl("Part 2:", sum)
-	pl("Part 2 duration:", durartion)
+	sumP2 := count(antiMap.grid, '#')
+	durartionP2 := time.Since(startP2)
+	durartionOverAll := time.Since(startOverAll)
+
+	pl("Part 1:", sumP1)
+	pl("Part 1 duration:", durartionP1)
+
+	pl("Part 2:", sumP2)
+	pl("Part 2 duration:", durartionP2)
+
+	pl("Overall duration:", durartionOverAll)
 
 	// for i := 0; i < antiMap.size; i++ {
 	// 	if i%antiMap.width == 0 {
