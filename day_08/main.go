@@ -105,7 +105,7 @@ func main() {
 				// calculate the distance between the two nodes
 				diff := coordsDiff(freqCoords, pairCoords)
 
-				// put the anti nodes in the antiMap on oppisite sides of the two nodes
+				// put the anti nodes in the antiMap on opposite sides of the two nodes
 				antiA := Coords{freqCoords.x + diff.x, freqCoords.y + diff.y}
 				antiB := Coords{pairCoords.x - diff.x, pairCoords.y - diff.y}
 
