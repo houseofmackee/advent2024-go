@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"time"
 )
 
@@ -20,14 +21,6 @@ type City struct {
 	height int
 	size   int
 	grid   []byte
-}
-
-// function to get the absolute difference betwen two ints
-func absDiffInt(x, y int) int {
-	if x < y {
-		return y - x
-	}
-	return x - y
 }
 
 func indexToCoords(index, width int) Coords {
@@ -54,10 +47,6 @@ func coordsToIndex(c Coords, width int) int {
 
 func coordsDiff(c1, c2 Coords) Coords {
 	return Coords{c1.x - c2.x, c1.y - c2.y}
-}
-
-func coordsDiffAbs(c1, c2 Coords) Coords {
-	return Coords{absDiffInt(c1.x, c2.x), absDiffInt(c1.y, c2.y)}
 }
 
 func count(grid []byte, value byte) int {
@@ -91,15 +80,8 @@ func main() {
 	}
 
 	mapSize := maxW * maxY
-	mapGrid := []byte(mapString)
-	antiGrid := make([]byte, mapSize)
-
-	cityMap := City{maxW, maxY, mapSize, mapGrid}
-	antiMap := City{maxW, maxY, mapSize, antiGrid}
-	// fill the antiMap with empty spaces
-	for i := 0; i < antiMap.size; i++ {
-		antiMap.grid[i] = '.'
-	}
+	cityMap := City{maxW, maxY, mapSize, []byte(mapString)}
+	antiMap := City{maxW, maxY, mapSize, slices.Repeat([]byte{'.'}, mapSize)}
 
 	// Part 1
 	start := time.Now()
@@ -108,15 +90,20 @@ func main() {
 		if char == '.' { //} || count(cityMap.grid, char) == 1 {
 			continue
 		}
+
+		// get the coordinates of the current antenna node
 		freqCoords := indexToCoords(i, cityMap.width)
 
 		// find all other nodes with the same frequency
 		for j := i + 1; j < cityMap.size; j++ {
 			if cityMap.grid[j] == char {
+				// get the coordinates of the paired antenna node
 				pairCoords := indexToCoords(j, cityMap.width)
 
 				// calculate the distance between the two nodes
 				diff := coordsDiff(freqCoords, pairCoords)
+
+				// put the anti nodes in the antiMap on oppisite sides of the two nodes
 				antiA := Coords{freqCoords.x + diff.x, freqCoords.y + diff.y}
 				antiB := Coords{pairCoords.x - diff.x, pairCoords.y - diff.y}
 
@@ -138,15 +125,20 @@ func main() {
 		if char == '.' { //|| count(cityMap.grid, char) == 1 {
 			continue
 		}
+
+		// get the coordinates of the current antenna node
 		freqCoords := indexToCoords(i, cityMap.width)
 
 		// find all other nodes with the same frequency
 		for j := i + 1; j < cityMap.size; j++ {
 			if cityMap.grid[j] == char {
+				// get the coordinates of the paired antenna node
 				pairCoords := indexToCoords(j, cityMap.width)
 
 				// calculate the distance between the two nodes
 				diff := coordsDiff(freqCoords, pairCoords)
+
+				// draw a dotted line extending both ways from the two nodes
 				lineLen := 1
 				for {
 					antiA := Coords{freqCoords.x + (lineLen * diff.x), freqCoords.y + (lineLen * diff.y)}
