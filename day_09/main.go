@@ -65,10 +65,9 @@ func findFirstFreeN(slice []int, n int) int {
 func checksum(slice []int) int {
 	checksum := 0
 	for i, v := range slice {
-		if v == -1 {
-			continue
+		if v != -1 {
+			checksum += v * i
 		}
-		checksum += v * i
 	}
 	return checksum
 }
@@ -127,7 +126,7 @@ func main() {
 	diskString = strings.TrimSpace(diskString)
 
 	////////////////////////////////////////
-	// Part 1
+	// part 1
 	startP1 := time.Now()
 
 	// turn digits string into slice of bytes with the same values
@@ -186,10 +185,10 @@ func main() {
 
 	// calculate checksum
 	sumP1 := checksum(blockMap)
-	durartionP1 := time.Since(startP1)
+	durationP1 := time.Since(startP1)
 
 	////////////////////////////////////////
-	// Part 2
+	// part 2
 	startP2 := time.Now()
 	for nextId := currentId - 1; nextId >= 0; nextId-- {
 		fileOffset := slices.Index(defragMap, nextId)
@@ -207,14 +206,14 @@ func main() {
 
 	// calculate checksum
 	sumP2 := checksum(defragMap)
-	durartionP2 := time.Since(startP2)
-	durartionOverAll := time.Since(startOverAll)
+	durationP2 := time.Since(startP2)
+	durationOverAll := time.Since(startOverAll)
 
 	pl("Part 1:", sumP1)
-	pl("Part 1 duration:", durartionP1)
+	pl("Part 1 duration:", durationP1)
 
 	pl("Part 2:", sumP2)
-	pl("Part 2 duration:", durartionP2)
+	pl("Part 2 duration:", durationP2)
 
-	pl("Overall duration:", durartionOverAll)
+	pl("Overall duration:", durationOverAll)
 }
