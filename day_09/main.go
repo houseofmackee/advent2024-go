@@ -195,7 +195,7 @@ func main() {
 		fileLength := countFrom(defragMap, nextId, fileOffset)
 		firstFree := findFirstFreeN(defragMap, fileLength)
 
-		// ignore if thete's no free space or if free space is after the file
+		// ignore if there's no free space or if free space is after the file
 		if firstFree == -1 || firstFree > fileOffset {
 			continue
 		}
