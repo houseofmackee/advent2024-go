@@ -33,7 +33,7 @@ type Map struct {
 func findTrailFrom(t Tile, m Map, visitor int) {
 	if t.height == 9 {
 		index := coordsToIndex(t.loc, m.width)
-		m.grid[index].trails = m.grid[index].trails + 1
+		m.grid[index].trails++
 		m.grid[index].visitors[visitor] = true
 		return
 	}
