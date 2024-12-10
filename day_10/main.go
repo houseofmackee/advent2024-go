@@ -137,9 +137,7 @@ func main() {
 	}
 
 	for _, currentStart := range startingLocations {
-		if topoMap.grid[currentStart].trails > 0 {
-			sumP1 += topoMap.grid[currentStart].trails
-		}
+		sumP1 += topoMap.grid[currentStart].trails
 	}
 
 	durationOverAll := time.Since(startOverAll)
