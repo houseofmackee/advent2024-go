@@ -130,7 +130,7 @@ func main() {
 	}
 
 	for _, currentTarget := range targetLocations {
-		for v, _ := range topoMap.grid[currentTarget].visitors {
+		for v := range topoMap.grid[currentTarget].visitors {
 			topoMap.grid[v].trails++
 		}
 		sumP2 += topoMap.grid[currentTarget].trails
