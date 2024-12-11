@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"maps"
 	"os"
 	"strconv"
 	"strings"
@@ -121,14 +122,10 @@ func main() {
 				newNums[k*2024] += v
 			}
 		}
-
-		for k, v := range newNums {
-			numMap[k] += v
-		}
-
-		blinks++
+		numMap = maps.Clone(newNums)
 
 		// part 1
+		blinks++
 		if blinks == numP1Blinks {
 			sumP1 = sumValues(&numMap)
 			p1End = time.Now()
