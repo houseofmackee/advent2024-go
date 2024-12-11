@@ -50,8 +50,12 @@ func initIsEvenLength() func(n int) bool {
 	}
 }
 
-func sumValues(m *map[int]int) int {
-	sum := 0
+type Number interface {
+	int | float32 | float64
+}
+
+func sumValues[K comparable, V Number](m *map[K]V) V {
+	var sum V
 	for _, v := range *m {
 		sum += v
 	}
@@ -82,7 +86,6 @@ func main() {
 		}
 		inputString += strings.TrimSpace(line)
 	}
-	valueString := strings.Split(inputString, " ")
 
 	// part 1 & 2
 	p1Start := time.Now()
@@ -90,20 +93,17 @@ func main() {
 	var p1End time.Time
 	var p2End time.Time
 
-	// turn string of numbers into slice of ints
-	numbers := make([]int, len(valueString))
-	for i, s := range valueString {
-		numbers[i], _ = strconv.Atoi(s)
-	}
-
 	sumP1 := 0
 	sumP2 := 0
 	numP1Blinks := 25
 	numP2Blinks := 75
 
+	// turn string of numbers into slice of values and count the occurences in a map
+	values := strings.Split(inputString, " ")
 	numMap := make(map[int]int)
-	for _, number := range numbers {
-		numMap[number]++
+	for _, value := range values {
+		v, _ := strconv.Atoi(value)
+		numMap[v]++
 	}
 
 	blinks := 0
