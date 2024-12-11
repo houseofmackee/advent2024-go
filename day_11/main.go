@@ -50,6 +50,14 @@ func initIsEvenLength() func(n int) bool {
 	}
 }
 
+func sumValues(m *map[int]int) int {
+	sum := 0
+	for _, v := range *m {
+		sum += v
+	}
+	return sum
+}
+
 var splitNumberInHalf = initSplitNumberInHalf()
 var isEvenLength = initIsEvenLength()
 
@@ -122,21 +130,13 @@ func main() {
 
 		// part 1
 		if blinks == numP1Blinks {
-			for _, v := range numMap {
-				if v > 0 {
-					sumP1 += v
-				}
-			}
+			sumP1 = sumValues(&numMap)
 			p1End = time.Now()
 		}
 
 		// part 2
 		if blinks == numP2Blinks {
-			for _, v := range numMap {
-				if v > 0 {
-					sumP2 += v
-				}
-			}
+			sumP2 = sumValues(&numMap)
 			p2End = time.Now()
 			break
 		}
