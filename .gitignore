@@ -26,5 +26,4 @@ go.work.sum
 .DS_Store
 
 # input files
-input.txt
-input_test.txt
+input*.txt
