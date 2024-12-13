@@ -51,8 +51,9 @@ func findRegion(m *Map, plotIndex, plotId int) {
 
 	x := m.grid[plotIndex].loc.x
 	y := m.grid[plotIndex].loc.y
+	borders := &m.grid[plotIndex].borders
 
-	for i, neighbour := range []Coords{
+	for direction, neighbour := range []Coords{
 		{x - 1, y},
 		{x + 1, y},
 		{x, y - 1},
@@ -60,16 +61,20 @@ func findRegion(m *Map, plotIndex, plotId int) {
 
 		// ignore tiles outside the map
 		if !isWithinBounds(neighbour, m) {
-			m.grid[plotIndex].borders.count++
-			m.grid[plotIndex].borders.facing[i] = true
+			borders.count++
+			borders.facing[direction] = true
 			continue
 		}
-		j := coordsToIndex(neighbour, m.width)
-		if m.grid[j].group == m.grid[plotIndex].group {
-			findRegion(m, j, plotId)
+
+		// find the index of the neighbour and check if it is in the same group
+		// if it is, continue to find/explore the region
+		// if it is not, increment the border count and record facing direction
+		index := coordsToIndex(neighbour, m.width)
+		if m.grid[index].group == m.grid[plotIndex].group {
+			findRegion(m, index, plotId)
 		} else {
-			m.grid[plotIndex].borders.count++
-			m.grid[plotIndex].borders.facing[i] = true
+			borders.count++
+			borders.facing[direction] = true
 		}
 	}
 }
