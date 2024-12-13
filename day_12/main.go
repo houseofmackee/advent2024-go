@@ -49,11 +49,14 @@ func findRegion(m *Map, plotIndex, plotId int) {
 	}
 	m.grid[plotIndex].id = plotId
 
+	x := m.grid[plotIndex].loc.x
+	y := m.grid[plotIndex].loc.y
+
 	for i, neighbour := range []Coords{
-		{m.grid[plotIndex].loc.x - 1, m.grid[plotIndex].loc.y},
-		{m.grid[plotIndex].loc.x + 1, m.grid[plotIndex].loc.y},
-		{m.grid[plotIndex].loc.x, m.grid[plotIndex].loc.y - 1},
-		{m.grid[plotIndex].loc.x, m.grid[plotIndex].loc.y + 1}} {
+		{x - 1, y},
+		{x + 1, y},
+		{x, y - 1},
+		{x, y + 1}} {
 
 		// ignore tiles outside the map
 		if !isWithinBounds(neighbour, m) {
