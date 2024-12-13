@@ -179,6 +179,26 @@ func main() {
 	// find all straight, uniterrupted, lines facing N/E/S/W
 	regionSides := make(map[int]int)
 	activeBorder := false
+
+	// helper function to walk a line and tell if it started or ended
+	walkLine := func(x, y, r, direction int) bool {
+		i := coordsToIndex(Coords{x, y}, topoMap.width)
+		if topoMap.grid[i].id == r {
+			if topoMap.grid[i].borders.facing[direction] {
+				if !activeBorder {
+					regionSides[r]++
+					activeBorder = true
+				}
+			} else {
+				activeBorder = false
+			}
+		} else {
+			activeBorder = false
+		}
+		return activeBorder
+	}
+
+	// check all regions
 	for r := range uniqueRegions {
 
 		// find MORTH and SOUTH facing borders
@@ -187,47 +207,13 @@ func main() {
 			// find NORTH facing borders
 			activeBorder = false
 			for x := 0; x < topoMap.width; x++ {
-				i := coordsToIndex(Coords{x, y}, topoMap.width)
-				if topoMap.grid[i].id == r {
-					// ignore if no borders
-					if topoMap.grid[i].borders.count == 0 {
-						activeBorder = false
-						continue
-					}
-					if topoMap.grid[i].borders.facing[NORTH] {
-						if !activeBorder {
-							regionSides[r]++
-							activeBorder = true
-						}
-					} else {
-						activeBorder = false
-					}
-				} else {
-					activeBorder = false
-				}
+				activeBorder = walkLine(x, y, r, NORTH)
 			}
 
 			// find SOUTH facing borders
 			activeBorder = false
 			for x := 0; x < topoMap.width; x++ {
-				i := coordsToIndex(Coords{x, y}, topoMap.width)
-				if topoMap.grid[i].id == r {
-					// ignore if no borders
-					if topoMap.grid[i].borders.count == 0 {
-						activeBorder = false
-						continue
-					}
-					if topoMap.grid[i].borders.facing[SOUTH] {
-						if !activeBorder {
-							regionSides[r]++
-							activeBorder = true
-						}
-					} else {
-						activeBorder = false
-					}
-				} else {
-					activeBorder = false
-				}
+				activeBorder = walkLine(x, y, r, SOUTH)
 			}
 		}
 
@@ -237,47 +223,13 @@ func main() {
 			// find EAST facing borders
 			activeBorder = false
 			for y := 0; y < topoMap.height; y++ {
-				i := coordsToIndex(Coords{x, y}, topoMap.width)
-				if topoMap.grid[i].id == r {
-					// ignore if no borders
-					if topoMap.grid[i].borders.count == 0 {
-						activeBorder = false
-						continue
-					}
-					if topoMap.grid[i].borders.facing[EAST] {
-						if !activeBorder {
-							regionSides[r]++
-							activeBorder = true
-						}
-					} else {
-						activeBorder = false
-					}
-				} else {
-					activeBorder = false
-				}
+				activeBorder = walkLine(x, y, r, EAST)
 			}
 
 			// find WEST facing borders
 			activeBorder = false
 			for y := 0; y < topoMap.height; y++ {
-				i := coordsToIndex(Coords{x, y}, topoMap.width)
-				if topoMap.grid[i].id == r {
-					// ignore if no borders
-					if topoMap.grid[i].borders.count == 0 {
-						activeBorder = false
-						continue
-					}
-					if topoMap.grid[i].borders.facing[WEST] {
-						if !activeBorder {
-							regionSides[r]++
-							activeBorder = true
-						}
-					} else {
-						activeBorder = false
-					}
-				} else {
-					activeBorder = false
-				}
+				activeBorder = walkLine(x, y, r, WEST)
 			}
 		}
 	}
